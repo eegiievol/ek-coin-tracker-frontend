@@ -86,13 +86,13 @@ export default function Volume24h() {
   const navigate = useNavigate()
   const [view, setView] = useState<View>('ranking')
 
+  // Shared coin selection across both views
+  const [allSymbols, setAllSymbols] = useState<SymbolInfo[]>([])
+  const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTED)
+
   // Ranking state
   const [tickers, setTickers] = useState<Ticker[]>([])
   const [topN, setTopN] = useState(30)
-
-  // History state
-  const [allSymbols, setAllSymbols] = useState<SymbolInfo[]>([])
-  const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTED)
   const [interval, setInterval] = useState<Interval>('1d')
   const [limit, setLimit] = useState('100')
   const [historySeries, setHistorySeries] = useState<Record<string, number>[]>([])
@@ -150,7 +150,11 @@ export default function Volume24h() {
   }
 
   const visibleSymbols = historySymbols.filter(s => !hidden.has(s))
-  const displayedTickers = tickers.slice(0, topN)
+
+  // Ranking: if coins selected filter to those, otherwise show top N
+  const displayedTickers = selected.length > 0
+    ? tickers.filter(t => selected.includes(t.symbol))
+    : tickers.slice(0, topN)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '16px 20px', gap: 16 }}>
@@ -179,14 +183,19 @@ export default function Volume24h() {
         </div>
 
         {view === 'ranking' && (
-          <div style={{ display: 'flex', gap: 8 }}>
-            {[15, 30, 50].map(n => (
-              <button key={n} onClick={() => setTopN(n)} style={{
-                background: topN === n ? '#1f6feb' : '#161b22',
-                border: '1px solid #30363d', color: '#c9d1d9',
-                padding: '4px 14px', borderRadius: 4, cursor: 'pointer', fontSize: 12,
-              }}>Top {n}</button>
-            ))}
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
+            <SymbolSelect symbols={allSymbols} selected={selected} onChange={setSelected} />
+            {selected.length === 0 && (
+              <div style={{ display: 'flex', gap: 8 }}>
+                {[15, 30, 50].map(n => (
+                  <button key={n} onClick={() => setTopN(n)} style={{
+                    background: topN === n ? '#1f6feb' : '#161b22',
+                    border: '1px solid #30363d', color: '#c9d1d9',
+                    padding: '4px 14px', borderRadius: 4, cursor: 'pointer', fontSize: 12,
+                  }}>Top {n}</button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
