@@ -83,7 +83,7 @@ export default function VolumeChart({ series, symbols, interval, colors }: Props
         {symbols.map(sym => (
           <Line
             key={sym}
-            type="monotone"
+            type="linear"
             dataKey={sym}
             stroke={colors[sym]}
             dot={false}

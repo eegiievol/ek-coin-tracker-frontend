@@ -10,6 +10,9 @@ const DEFAULT_SELECTED = ['BTCUSDT','ETHUSDT','SOLUSDT','BNBUSDT','XRPUSDT',
   'DOGEUSDT','ADAUSDT','AVAXUSDT','LINKUSDT','DOTUSDT']
 
 const INTERVAL_OPTIONS: { value: Interval; label: string }[] = [
+  { value: '1m',  label: '1M'  },
+  { value: '5m',  label: '5M'  },
+  { value: '15m', label: '15M' },
   { value: '1h',  label: '1H'  },
   { value: '4h',  label: '4H'  },
   { value: '1d',  label: '1D'  },
