@@ -30,6 +30,21 @@ export async function fetchSymbols(): Promise<SymbolInfo[]> {
   return data.symbols
 }
 
+export interface Ticker {
+  symbol: string
+  last_price: number
+  change_24h_pct: number
+  high_24h: number
+  low_24h: number
+  volume_24h: number
+  turnover_24h: number
+}
+
+export async function fetchTickers(limit = 100): Promise<Ticker[]> {
+  const data = await get<{ count: number; tickers: Ticker[] }>(`/api/tickers?limit=${limit}`)
+  return data.tickers
+}
+
 export async function fetchVolumeChange(
   symbols: string[],
   interval: Interval,
