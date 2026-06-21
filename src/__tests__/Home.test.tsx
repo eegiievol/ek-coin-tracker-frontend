@@ -21,19 +21,19 @@ describe('Home', () => {
 
   it('renders both navigation cards', () => {
     renderHome()
-    expect(screen.getByText('Volume Change Analyzer')).toBeInTheDocument()
-    expect(screen.getByText('24H Volume Ranking')).toBeInTheDocument()
+    expect(screen.getByText('Эзлэхүүний өөрчлөлт')).toBeInTheDocument()
+    expect(screen.getByText('24 цагийн эзлэхүүн')).toBeInTheDocument()
   })
 
   it('navigates to /analyzer on first card click', () => {
     renderHome()
-    fireEvent.click(screen.getByText('Volume Change Analyzer'))
+    fireEvent.click(screen.getByText('Эзлэхүүний өөрчлөлт'))
     expect(mockNavigate).toHaveBeenCalledWith('/analyzer')
   })
 
   it('navigates to /volume24h on second card click', () => {
     renderHome()
-    fireEvent.click(screen.getByText('24H Volume Ranking'))
+    fireEvent.click(screen.getByText('24 цагийн эзлэхүүн'))
     expect(mockNavigate).toHaveBeenCalledWith('/volume24h')
   })
 })

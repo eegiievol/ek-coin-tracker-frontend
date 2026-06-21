@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 const cards = [
   {
     path: '/analyzer',
-    title: 'Volume Change Analyzer',
-    description: 'Track volume % change over time across multiple coins on the same chart.',
+    title: 'Эзлэхүүний өөрчлөлт',
+    description: 'Олон хоосон зоосны эзлэхүүний хувийн өөрчлөлтийг нэг графикт харьцуулан харах.',
     icon: (
       <svg viewBox="0 0 48 48" width="48" height="48" fill="none">
         <polyline points="4,38 14,28 22,32 32,16 42,22 48,10"
@@ -15,8 +15,8 @@ const cards = [
   },
   {
     path: '/volume24h',
-    title: '24H Volume Ranking',
-    description: 'See which coins have the highest USDT trading volume in the last 24 hours.',
+    title: '24 цагийн эзлэхүүн',
+    description: 'Сүүлийн 24 цагт хамгийн их USDT арилжааны эзлэхүүнтэй хоосон зоосыг харах.',
     icon: (
       <svg viewBox="0 0 48 48" width="48" height="48" fill="none">
         <rect x="4"  y="28" width="8"  height="16" rx="2" fill="#3b82f6"/>
@@ -51,7 +51,7 @@ export default function Home() {
           EK Coin Tracker
         </h1>
         <p style={{ color: '#8b949e', fontSize: 15 }}>
-          Bybit USDT Perpetual Futures — Real-time volume analytics
+          Bybit USDT Бессрочний Фьючерс — Эзлэхүүний шинжилгээ
         </p>
       </div>
 
@@ -91,7 +91,7 @@ export default function Home() {
               </div>
             </div>
             <div style={{ fontSize: 13, color: card.accent, marginTop: 'auto' }}>
-              Open →
+              Нээх →
             </div>
           </div>
         ))}

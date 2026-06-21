@@ -56,3 +56,15 @@ export async function fetchVolumeChange(
     limit: String(limit),
   })
 }
+
+export async function fetchVolumeRaw(
+  symbols: string[],
+  interval: Interval,
+  limit: number,
+): Promise<VolumeChangeSeries> {
+  return get('/api/volume/raw', {
+    symbols: symbols.join(','),
+    interval,
+    limit: String(limit),
+  })
+}
