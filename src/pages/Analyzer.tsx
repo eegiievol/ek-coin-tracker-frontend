@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchSymbols, fetchVolumeChange, fetchTickers } from '../api/client'
-import type { SymbolInfo, Interval, VolumeChangeSeries } from '../api/client'
+import type { SymbolInfo, Interval, VolumeChangeSeries, Ticker } from '../api/client'
 import SymbolSelect from '../components/SymbolSelect'
 import SimpleDropdown from '../components/SimpleDropdown'
 import VolumeChart, { buildColorMap } from '../components/VolumeChart'
-import ChartLegend from '../components/ChartLegend'
+import RankingsPanel from '../components/RankingsPanel'
 
 const DEFAULT_SELECTED = ['BTCUSDT','ETHUSDT','SOLUSDT','BNBUSDT','XRPUSDT',
   'DOGEUSDT','ADAUSDT','AVAXUSDT','LINKUSDT','DOTUSDT']
@@ -34,21 +34,25 @@ export default function Analyzer() {
   const [interval, setInterval] = useState<Interval>('1d')
   const [limit, setLimit] = useState('100')
   const [data, setData] = useState<VolumeChangeSeries | null>(null)
+  const [tickers, setTickers] = useState<Ticker[]>([])
   const [loading, setLoading] = useState(false)
+  const [loadingTop, setLoadingTop] = useState(false)
   const [error, setError] = useState('')
   const [hidden, setHidden] = useState<Set<string>>(new Set())
   const [colors, setColors] = useState<Record<string, string>>({})
-  const [loadingTop, setLoadingTop] = useState(false)
 
+  // Load symbol list and tickers on mount
   useEffect(() => {
     fetchSymbols().then(setSymbols).catch(() => setError('Failed to load symbols'))
+    fetchTickers(200).then(setTickers).catch(() => {})
   }, [])
 
   async function selectTop50() {
     setLoadingTop(true)
     try {
-      const tickers = await fetchTickers(50)
-      setSelected(tickers.map(t => t.symbol))
+      const t = await fetchTickers(50)
+      setTickers(t)
+      setSelected(t.map(t => t.symbol))
     } catch {
       setError('Failed to load top coins')
     } finally {
@@ -142,8 +146,15 @@ export default function Analyzer() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <VolumeChart series={data.series} symbols={visibleSymbols} interval={interval} colors={colors} />
           </div>
-          <div style={{ width: 160, flexShrink: 0, background: '#0d1117', border: '1px solid #21262d', borderRadius: 6, padding: '10px 8px' }}>
-            <ChartLegend symbols={data.symbols} colors={colors} series={data.series} hidden={hidden} onToggle={toggleHidden} />
+          <div style={{ width: 170, flexShrink: 0, background: '#0d1117', border: '1px solid #21262d', borderRadius: 6, padding: '10px 8px' }}>
+            <RankingsPanel
+              symbols={data.symbols}
+              colors={colors}
+              series={data.series}
+              tickers={tickers}
+              hidden={hidden}
+              onToggle={toggleHidden}
+            />
           </div>
         </div>
       )}
