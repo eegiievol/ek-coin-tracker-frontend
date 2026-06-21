@@ -27,6 +27,13 @@ const LIMIT_OPTIONS = [
   { value: '500', label: '500 candles' },
 ]
 
+const TOP_N_OPTIONS = [
+  { value: '5',  label: 'Top 5 Vol'  },
+  { value: '10', label: 'Top 10 Vol' },
+  { value: '20', label: 'Top 20 Vol' },
+  { value: '50', label: 'Top 50 Vol' },
+]
+
 export default function Analyzer() {
   const navigate = useNavigate()
   const [symbols, setSymbols] = useState<SymbolInfo[]>([])
@@ -37,6 +44,7 @@ export default function Analyzer() {
   const [tickers, setTickers] = useState<Ticker[]>([])
   const [loading, setLoading] = useState(false)
   const [loadingTop, setLoadingTop] = useState(false)
+  const [topN, setTopN] = useState('50')
   const [error, setError] = useState('')
   const [hidden, setHidden] = useState<Set<string>>(new Set())
   const [colors, setColors] = useState<Record<string, string>>({})
@@ -47,10 +55,10 @@ export default function Analyzer() {
     fetchTickers(200).then(setTickers).catch(() => {})
   }, [])
 
-  async function selectTop50() {
+  async function selectTopN(n: number) {
     setLoadingTop(true)
     try {
-      const t = await fetchTickers(50)
+      const t = await fetchTickers(n)
       setTickers(t)
       setSelected(t.map(t => t.symbol))
     } catch {
@@ -58,6 +66,11 @@ export default function Analyzer() {
     } finally {
       setLoadingTop(false)
     }
+  }
+
+  async function handleTopNChange(n: string) {
+    setTopN(n)
+    await selectTopN(Number(n))
   }
 
   const load = useCallback(async () => {
@@ -107,19 +120,15 @@ export default function Analyzer() {
 
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
           <SymbolSelect symbols={symbols} selected={selected} onChange={setSelected} />
-          <button
-            onClick={selectTop50}
-            disabled={loadingTop}
-            title="Select top 50 coins by 24h USDT volume"
-            style={{
-              background: '#21262d', border: '1px solid #30363d', color: '#c9d1d9',
-              padding: '6px 12px', borderRadius: 4, cursor: loadingTop ? 'not-allowed' : 'pointer',
-              fontSize: 12, opacity: loadingTop ? 0.6 : 1, whiteSpace: 'nowrap',
-            }}
-          >
-            {loadingTop ? '…' : 'Top 50 Vol'}
-          </button>
         </div>
+
+        <SimpleDropdown
+          label="Top N"
+          value={topN}
+          options={TOP_N_OPTIONS}
+          onChange={handleTopNChange}
+          disabled={loadingTop}
+        />
 
         <SimpleDropdown label="Interval" value={interval} options={INTERVAL_OPTIONS} onChange={setInterval} />
         <SimpleDropdown label="Candles"  value={limit}    options={LIMIT_OPTIONS}    onChange={setLimit}    />

@@ -5,9 +5,10 @@ interface Props<T extends string> {
   value: T
   options: { value: T; label: string }[]
   onChange: (v: T) => void
+  disabled?: boolean
 }
 
-export default function SimpleDropdown<T extends string>({ label, value, options, onChange }: Props<T>) {
+export default function SimpleDropdown<T extends string>({ label, value, options, onChange, disabled }: Props<T>) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -24,7 +25,7 @@ export default function SimpleDropdown<T extends string>({ label, value, options
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <div style={{ fontSize: 11, color: '#8b949e', marginBottom: 4 }}>{label}</div>
-      <button onClick={() => setOpen(p => !p)} style={btnStyle}>
+      <button onClick={() => !disabled && setOpen(p => !p)} disabled={disabled} style={{ ...btnStyle, opacity: disabled ? 0.6 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}>
         {current?.label ?? value} <span style={{ fontSize: 9, opacity: 0.6 }}>▼</span>
       </button>
       {open && (
