@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { fetchSymbols, fetchVolumeChange } from '../api/client'
+import { fetchSymbols, fetchVolumeChange, fetchTickers } from '../api/client'
 import type { SymbolInfo, Interval, VolumeChangeSeries } from '../api/client'
 import SymbolSelect from '../components/SymbolSelect'
 import SimpleDropdown from '../components/SimpleDropdown'
@@ -38,10 +38,23 @@ export default function Analyzer() {
   const [error, setError] = useState('')
   const [hidden, setHidden] = useState<Set<string>>(new Set())
   const [colors, setColors] = useState<Record<string, string>>({})
+  const [loadingTop, setLoadingTop] = useState(false)
 
   useEffect(() => {
     fetchSymbols().then(setSymbols).catch(() => setError('Failed to load symbols'))
   }, [])
+
+  async function selectTop50() {
+    setLoadingTop(true)
+    try {
+      const tickers = await fetchTickers(50)
+      setSelected(tickers.map(t => t.symbol))
+    } catch {
+      setError('Failed to load top coins')
+    } finally {
+      setLoadingTop(false)
+    }
+  }
 
   const load = useCallback(async () => {
     const syms = selected.length > 0 ? selected : DEFAULT_SELECTED
@@ -85,10 +98,24 @@ export default function Analyzer() {
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontSize: 11, color: '#8b949e', marginBottom: 4 }}>Exchange</div>
-          <button style={staticBtn}>Bybit Futures</button>
+          <button style={staticBtn}>Binance Futures</button>
         </div>
 
-        <SymbolSelect symbols={symbols} selected={selected} onChange={setSelected} />
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+          <SymbolSelect symbols={symbols} selected={selected} onChange={setSelected} />
+          <button
+            onClick={selectTop50}
+            disabled={loadingTop}
+            title="Select top 50 coins by 24h USDT volume"
+            style={{
+              background: '#21262d', border: '1px solid #30363d', color: '#c9d1d9',
+              padding: '6px 12px', borderRadius: 4, cursor: loadingTop ? 'not-allowed' : 'pointer',
+              fontSize: 12, opacity: loadingTop ? 0.6 : 1, whiteSpace: 'nowrap',
+            }}
+          >
+            {loadingTop ? '…' : 'Top 50 Vol'}
+          </button>
+        </div>
 
         <SimpleDropdown label="Interval" value={interval} options={INTERVAL_OPTIONS} onChange={setInterval} />
         <SimpleDropdown label="Candles"  value={limit}    options={LIMIT_OPTIONS}    onChange={setLimit}    />
